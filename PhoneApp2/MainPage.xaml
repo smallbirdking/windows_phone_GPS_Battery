@@ -1,0 +1,43 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="PhoneApp2.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:my="clr-namespace:Microsoft.Phone.Controls.Maps;assembly=Microsoft.Phone.Controls.Maps"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    shell:SystemTray.IsVisible="True">
+
+    <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="241*"/>
+            <RowDefinition Height="515*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Height="30" Margin="12,6,395,0" Name="textBlock1" Text="Long:" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,42,0,0" Name="textBlock2" Text="Lat:" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="71,6,0,0" Name="longitudeTextBlock" Text="Long" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="53,42,0,0" Name="latitudeTextBlock" Text="Lat" VerticalAlignment="Top" />
+        <my:Map Height="352" HorizontalAlignment="Left" Margin="12,80.866,0,0" Name="myMap" VerticalAlignment="Top" Width="421" CredentialsProvider="AoCzpmnqBuqL32Fe2zPiQ4hL_6NDTN6eA3EZ39sbLGlX0vD6xJBe6q0z0Xc4_ViY" ZoomLevel="1" Grid.Row="1" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,196,0,0" Name="textBlock3" Text="Status:" VerticalAlignment="Top" />
+        <TextBlock Height="66" HorizontalAlignment="Left" Margin="78,196,0,0" Name="statusTextBlock" Text="Status TextBlock w/TextWrapping=&quot;Wrap&quot;" VerticalAlignment="Top" Width="355" TextWrapping="Wrap" Grid.RowSpan="2" />
+        <Button Content="Track Me On Map" Height="72" HorizontalAlignment="Left" Margin="0,14.866,0,0" Name="trackMe" VerticalAlignment="Top" Width="115" Click="trackMe_Click" Grid.Row="1" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,78,0,0" Name="textBlock4" Text="Speed:" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="78,78,0,0" Name="speedreadout" Text="Meters Per Second" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,114,0,0" Name="textBlock6" Text="Course:" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="84,114,0,0" Name="coursereadout" Text="Heading in Degrees (0=N)" VerticalAlignment="Top" Width="339" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,150,0,0" Name="textBlock5" Text="Altitude:" VerticalAlignment="Top" />
+        <TextBlock Height="30" HorizontalAlignment="Left" Margin="91,149,0,0" Name="altitudereadout" Text="Altitude in Meters (0=Sea Level)" VerticalAlignment="Top" />
+        <Button Content="Stop LocServ" Height="72" HorizontalAlignment="Left" Margin="351,14.866,0,0" Name="startStop" VerticalAlignment="Top" Width="93" Click="startStop_Click" Grid.Row="1" />
+        <StackPanel Margin="0,197,0,-197" Grid.RowSpan="2">
+            <TextBlock x:Name="tbInfo" FontSize="25" />
+            <Button Content="get informaion battery" Click="Button_Click" Margin="164,0,163,0" Height="65" />
+        </StackPanel>
+    </Grid>
+
+</phone:PhoneApplicationPage>
