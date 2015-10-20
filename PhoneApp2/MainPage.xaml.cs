@@ -21,7 +21,7 @@ using System.Collections.ObjectModel;
 namespace PhoneApp2
 {
     public enum Places{
-        UNKNOWN = -1,  WORK = 0, HOME = 1
+        UNKNOWN = -1,  WORK = 0, HOME = 1, SCHOOL = 2, BEACH = 3
     }
     public partial class MainPage : PhoneApplicationPage, INotifyPropertyChanged
     {
@@ -30,9 +30,11 @@ namespace PhoneApp2
         bool trackingOn = false;
 
         Pushpin myPushpin = new Pushpin();
-        TimeSpan batteryLevelWhenEnteringCurrentPlace;
+        int batteryLevelWhenEnteringCurrentPlace;
         // Data context for the local database
         private LocationsAndBatteryDataContext locationsBaterryDB;
+        Double myCurrentLatitude = 0.0;
+        Double myCurrentLongitude = 0.0;
         // Constructeur
         public MainPage()
         {
@@ -196,6 +198,8 @@ namespace PhoneApp2
         void watcher_PositionChanged(object sender, GeoPositionChangedEventArgs<GeoCoordinate> e)
         {
             latitudeTextBlock.Text = e.Position.Location.Latitude.ToString("0.0000000000000");
+            this.myCurrentLatitude = e.Position.Location.Latitude;
+            this.myCurrentLongitude = e.Position.Location.Longitude;
             longitudeTextBlock.Text = e.Position.Location.Longitude.ToString("0.0000000000000");
             speedreadout.Text = e.Position.Location.Speed.ToString("0.0") + " meters per second";
             coursereadout.Text = e.Position.Location.Course.ToString("0.0");
@@ -219,11 +223,11 @@ namespace PhoneApp2
             this.currentPlace = newPlace;
             //current battery level
             var myBattery = Battery.GetDefault();
-            int pc = myBattery.RemainingChargePercent;
-            this.batteryLevelWhenEnteringCurrentPlace = myBattery.RemainingDischargeTime;
+            this.batteryLevelWhenEnteringCurrentPlace = myBattery.RemainingChargePercent;
 
+            insertNewLocationsValue(new DateTime(), myCurrentLongitude, myCurrentLatitude, myBattery.RemainingChargePercent, newPlace);
             //start recording the positions and save it with the Place name
-            // newPlace | long | lat
+
         }
         /*
             Leaving the current place. This suppose that we previously entered a place.
@@ -233,15 +237,15 @@ namespace PhoneApp2
         {
             //How much did we used the battery at that place ?
             var myBattery = Battery.GetDefault();
-            int pc = myBattery.RemainingChargePercent;
             //By doing this we also suppose that the user didn't charge his phone (otherwise the value will be negative)
-            TimeSpan batteryUsage = this.batteryLevelWhenEnteringCurrentPlace - myBattery.RemainingDischargeTime;
+            int batteryUsage = this.batteryLevelWhenEnteringCurrentPlace - myBattery.RemainingChargePercent; 
             //Here we have to Save the data usage for currentPlace (batteryUsage)
+            insertNewBatteryUsageValue(currentPlace, batteryUsage);
 
             this.currentPlace = Places.UNKNOWN;
 
         }
-        void insertNewBatteryUsageValue(Places place, Double batteryUsageValue)
+        void insertNewBatteryUsageValue(Places place, int batteryUsageValue)
         {
             // Create a new  item based on the text box.
             BatteryUsage newbatteryUsage = new BatteryUsage { Place = (int)place , BatteryUsageValue = batteryUsageValue};
@@ -252,10 +256,10 @@ namespace PhoneApp2
             // Add a to-do item to the local database.
             locationsBaterryDB.batteryUsage.InsertOnSubmit(newbatteryUsage);
         }
-        void insertNewLocationsValue(TimeSpan timespan, Double longitude, Double latitude, Double battery_level)
+        void insertNewLocationsValue(DateTime date, Double longitude, Double latitude, int battery_level, Places place)
         {
             // Create a new item based on the text box.
-            Locations newLocation = new Locations { LocationsTime = timespan , LocationsLongitude = longitude, LocationsLatitude = latitude , LocationsBatteryLevel = battery_level};
+            Locations newLocation = new Locations { LocationsTime = date, LocationsLongitude = longitude, LocationsLatitude = latitude , LocationsBatteryLevel = battery_level , LocationsPlace = (int)place};
 
             // Add anew item to the observable collection.
             Locations.Add(newLocation);
@@ -312,10 +316,10 @@ namespace PhoneApp2
             }
         }
 
-        private TimeSpan _locationstime;
+        private DateTime _locationstime;
 
         [Column]
-        public TimeSpan LocationsTime
+        public DateTime LocationsTime
         {
             get
             {
@@ -372,10 +376,10 @@ namespace PhoneApp2
             }
         }
 
-        private Double _locationsBatteryLevel;
+        private int _locationsBatteryLevel;
 
         [Column]
-        public Double LocationsBatteryLevel
+        public int LocationsBatteryLevel
         {
             get
             {
@@ -392,6 +396,25 @@ namespace PhoneApp2
             }
         }
 
+        private int _locationsPlace;
+
+        [Column]
+        public int LocationsPlace
+        {
+            get
+            {
+                return _locationsPlace;
+            }
+            set
+            {
+                if (_locationsPlace != value)
+                {
+                    NotifyPropertyChanging("LocationsPlace");
+                    _locationsPlace = value;
+                    NotifyPropertyChanged("LocationsPlace");
+                }
+            }
+        }
 
 
         #region INotifyPropertyChanged Members
@@ -469,10 +492,10 @@ namespace PhoneApp2
             }
         }
 
-        private Double _batteryUsageValue;
+        private int _batteryUsageValue;
 
         [Column]
-        public Double BatteryUsageValue
+        public int BatteryUsageValue
         {
             get
             {
