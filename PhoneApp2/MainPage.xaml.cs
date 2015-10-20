@@ -23,7 +23,7 @@ namespace PhoneApp2
     public enum Places{
         UNKNOWN = -1,  WORK = 0, HOME = 1
     }
-    public partial class MainPage : PhoneApplicationPage
+    public partial class MainPage : PhoneApplicationPage, INotifyPropertyChanged
     {
         GeoCoordinateWatcher watcher;
         Places currentPlace;
@@ -46,6 +46,58 @@ namespace PhoneApp2
             //BuildLocalizedApplicationBar();
            
         }
+        // Data context for the local database
+        private LocationsAndBatteryDataContext locationsBaterryDB;
+
+        // Define an observable collection property that controls can bind to.
+        private ObservableCollection<Locations> _locations;
+        public ObservableCollection<Locations> Locations
+        {
+            get
+            {
+                return _locations;
+            }
+            set
+            {
+                if (_locations != value)
+                {
+                    _locations = value;
+                    NotifyPropertyChanged("Locations");
+                }
+            }
+        }
+        // Define an observable collection property that controls can bind to.
+        private ObservableCollection<BatteryUsage> _batteryUsage;
+        public ObservableCollection<BatteryUsage> BatteryUsage
+        {
+            get
+            {
+                return _batteryUsage;
+            }
+            set
+            {
+                if (_batteryUsage != value)
+                {
+                    _batteryUsage = value;
+                    NotifyPropertyChanged("BatteryUsage");
+                }
+            }
+        }
+
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Used to notify the app that a property has changed.
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+        #endregion
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
