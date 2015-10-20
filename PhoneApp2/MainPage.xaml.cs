@@ -157,13 +157,23 @@ namespace PhoneApp2
             var myBattery = Battery.GetDefault();
             int pc = myBattery.RemainingChargePercent;
             this.batteryLevelWhenEnteringCurrentPlace = myBattery.RemainingDischargeTime;
+
+            //start recording the positions and save it with the Place name
+            // newPlace | long | lat
         }
+        /*
+            Leaving the current place. This suppose that we previously entered a place.
+            It's now time to check the battery level, 
+        */
         void leavingCurrentPlace()
         {
             //How much did we used the battery at that place ?
             var myBattery = Battery.GetDefault();
             int pc = myBattery.RemainingChargePercent;
-            TimeSpan batteryUsage = myBattery.RemainingDischargeTime - this.batteryLevelWhenEnteringCurrentPlace;
+            //By doing this we also suppose that the user didn't charge his phone (otherwise the value will be negative)
+            TimeSpan batteryUsage = this.batteryLevelWhenEnteringCurrentPlace - myBattery.RemainingDischargeTime;
+            //Here we have to Save the data usage for currentPlace (batteryUsage)
+
             this.currentPlace = Places.UNKNOWN;
 
         }
