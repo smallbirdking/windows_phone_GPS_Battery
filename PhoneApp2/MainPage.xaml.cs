@@ -12,6 +12,11 @@ using Microsoft.Phone.Controls.Maps;
 using System.Device.Location;
 using System.Threading;
 using Windows.Phone.Devices.Power;
+using System.Data.Linq;
+using System.Data.Linq.Mapping;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+
 
 namespace PhoneApp2
 {
@@ -180,4 +185,252 @@ namespace PhoneApp2
 
 
     }
+    public class LocationsAndBatteryDataContext : DataContext
+    {
+        // Specify the connection string as a static, used in main page and app.xaml.
+        public static string DBConnectionString = "Data Source=isostore:/ToDo.sdf";
+
+        // Pass the connection string to the base class.
+        public LocationsAndBatteryDataContext(string connectionString)
+            : base(connectionString)
+        { }
+
+        public Table<Locations> locations;
+        public Table<BatteryUsage> batteryUsage;
+    }
+
+    [Table]
+    public class Locations : INotifyPropertyChanged, INotifyPropertyChanging
+    {
+        // Define ID: private field, public property and database column.
+        private int _locationsId;
+
+        [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
+        public int LocationsID
+        {
+            get
+            {
+                return _locationsId;
+            }
+            set
+            {
+                if (_locationsId != value)
+                {
+                    NotifyPropertyChanging("LocationsID");
+                    _locationsId = value;
+                    NotifyPropertyChanged("LocationsID");
+                }
+            }
+        }
+
+        private TimeSpan _locationstime;
+
+        [Column]
+        public TimeSpan LocationsTime
+        {
+            get
+            {
+                return _locationstime;
+            }
+            set
+            {
+                if (_locationstime != value)
+                {
+                    NotifyPropertyChanging("LocationsTime");
+                    _locationstime = value;
+                    NotifyPropertyChanged("LocationsTime");
+                }
+            }
+        }
+
+        private Double _locationsLatitude;
+
+        [Column]
+        public Double LocationsLatitude
+        {
+            get
+            {
+                return _locationsLatitude;
+            }
+            set
+            {
+                if (_locationsLatitude != value)
+                {
+                    NotifyPropertyChanging("LocationsLatitude");
+                    _locationsLatitude = value;
+                    NotifyPropertyChanged("LocationsLatitude");
+                }
+            }
+        }
+
+        private Double _locationsLongitude;
+
+        [Column]
+        public Double LocationsLongitude
+        {
+            get
+            {
+                return _locationsLongitude;
+            }
+            set
+            {
+                if (_locationsLongitude != value)
+                {
+                    NotifyPropertyChanging("LocationsLongitude");
+                    _locationsLongitude = value;
+                    NotifyPropertyChanged("LocationsLongitude");
+                }
+            }
+        }
+
+        private Double _locationsBatteryLevel;
+
+        [Column]
+        public Double LocationsBatteryLevel
+        {
+            get
+            {
+                return _locationsBatteryLevel;
+            }
+            set
+            {
+                if (_locationsBatteryLevel != value)
+                {
+                    NotifyPropertyChanging("LocationsBatteryLevel");
+                    _locationsBatteryLevel = value;
+                    NotifyPropertyChanged("LocationsBatteryLevel");
+                }
+            }
+        }
+
+
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Used to notify the page that a data context property changed
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        #endregion
+
+        #region INotifyPropertyChanging Members
+
+        public event PropertyChangingEventHandler PropertyChanging;
+
+        // Used to notify the data context that a data context property is about to change
+        private void NotifyPropertyChanging(string propertyName)
+        {
+            if (PropertyChanging != null)
+            {
+                PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
+            }
+        }
+
+        #endregion
+    }
+
+    [Table]
+    public class BatteryUsage : INotifyPropertyChanged, INotifyPropertyChanging
+    {
+        // Define ID: private field, public property and database column.
+        private int _batteryUsageId;
+
+        [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
+        public int LocationsID
+        {
+            get
+            {
+                return _batteryUsageId;
+            }
+            set
+            {
+                if (_batteryUsageId != value)
+                {
+                    NotifyPropertyChanging("LocationsID");
+                    _batteryUsageId = value;
+                    NotifyPropertyChanged("LocationsID");
+                }
+            }
+        }
+
+        private int _place;
+
+        [Column]
+        public int Place
+        {
+            get
+            {
+                return _place;
+            }
+            set
+            {
+                if (_place != value)
+                {
+                    NotifyPropertyChanging("Place");
+                    _place = value;
+                    NotifyPropertyChanged("Place");
+                }
+            }
+        }
+
+        private Double _batteryUsageValue;
+
+        [Column]
+        public Double BatteryUsageValue
+        {
+            get
+            {
+                return _batteryUsageValue;
+            }
+            set
+            {
+                if (_batteryUsageValue != value)
+                {
+                    NotifyPropertyChanging("BatteryUsageValue");
+                    _batteryUsageValue = value;
+                    NotifyPropertyChanged("BatteryUsageValue");
+                }
+            }
+        }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        // Used to notify the page that a data context property changed
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        #endregion
+
+        #region INotifyPropertyChanging Members
+
+        public event PropertyChangingEventHandler PropertyChanging;
+
+        // Used to notify the data context that a data context property is about to change
+        private void NotifyPropertyChanging(string propertyName)
+        {
+            if (PropertyChanging != null)
+            {
+                PropertyChanging(this, new PropertyChangingEventArgs(propertyName));
+            }
+        }
+
+        #endregion
+    }
+
+
+
 }

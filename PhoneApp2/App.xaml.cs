@@ -54,6 +54,15 @@ namespace PhoneApp2
                 // et seront alimentées par la batterie lorsque l'utilisateur ne se sert pas du téléphone.
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
+            // Create the database if it does not exist.
+            using (LocationsAndBatteryDataContext db = new LocationsAndBatteryDataContext(LocationsAndBatteryDataContext.DBConnectionString))
+            {
+                if (db.DatabaseExists() == false)
+                {
+                    //Create the database
+                    db.CreateDatabase();
+                }
+            }
 
         }
 
