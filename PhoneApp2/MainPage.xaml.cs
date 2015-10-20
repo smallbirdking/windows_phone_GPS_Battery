@@ -15,13 +15,17 @@ using Windows.Phone.Devices.Power;
 
 namespace PhoneApp2
 {
+    public enum Places{
+        UNKNOWN = -1,  WORK = 0, HOME = 1
+    }
     public partial class MainPage : PhoneApplicationPage
     {
         GeoCoordinateWatcher watcher;
-
+        Places currentPlace;
         bool trackingOn = false;
 
         Pushpin myPushpin = new Pushpin();
+        TimeSpan batteryLevelWhenEnteringCurrentPlace;
         // Constructeur
         public MainPage()
         {
@@ -35,6 +39,7 @@ namespace PhoneApp2
 
             // Exemple de code pour la localisation d'ApplicationBar
             //BuildLocalizedApplicationBar();
+           
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -141,5 +146,28 @@ namespace PhoneApp2
                 }
             }
         }
+        /*
+            Entering in a new place = check if enough battery compared to the former battery usage data
+            and start recording the battery usage to improve the datas.
+        */
+        void enteringAPlace(Places newPlace)
+        {
+            this.currentPlace = newPlace;
+            //current battery level
+            var myBattery = Battery.GetDefault();
+            int pc = myBattery.RemainingChargePercent;
+            this.batteryLevelWhenEnteringCurrentPlace = myBattery.RemainingDischargeTime;
+        }
+        void leavingCurrentPlace()
+        {
+            //How much did we used the battery at that place ?
+            var myBattery = Battery.GetDefault();
+            int pc = myBattery.RemainingChargePercent;
+            TimeSpan batteryUsage = myBattery.RemainingDischargeTime - this.batteryLevelWhenEnteringCurrentPlace;
+            this.currentPlace = Places.UNKNOWN;
+
+        }
+
+
     }
 }
