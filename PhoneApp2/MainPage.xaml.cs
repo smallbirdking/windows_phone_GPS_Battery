@@ -31,6 +31,8 @@ namespace PhoneApp2
 
         Pushpin myPushpin = new Pushpin();
         TimeSpan batteryLevelWhenEnteringCurrentPlace;
+        // Data context for the local database
+        private LocationsAndBatteryDataContext locationsBaterryDB;
         // Constructeur
         public MainPage()
         {
@@ -44,10 +46,15 @@ namespace PhoneApp2
 
             // Exemple de code pour la localisation d'ApplicationBar
             //BuildLocalizedApplicationBar();
-           
+            // Connect to the database and instantiate data context.
+            locationsBaterryDB = new LocationsAndBatteryDataContext(LocationsAndBatteryDataContext.DBConnectionString);
+
+            // Data context and observable collection are children of the main page.
+            this.DataContext = this;
+
+
         }
-        // Data context for the local database
-        private LocationsAndBatteryDataContext locationsBaterryDB;
+        
 
         // Define an observable collection property that controls can bind to.
         private ObservableCollection<Locations> _locations;
@@ -234,9 +241,39 @@ namespace PhoneApp2
             this.currentPlace = Places.UNKNOWN;
 
         }
+        void insertNewBatteryUsageValue(Places place, Double batteryUsageValue)
+        {
+            // Create a new  item based on the text box.
+            BatteryUsage newbatteryUsage = new BatteryUsage { Place = (int)place , BatteryUsageValue = batteryUsageValue};
+
+            // Add anew item to the observable collection.
+            BatteryUsage.Add(newbatteryUsage);
+
+            // Add a to-do item to the local database.
+            locationsBaterryDB.batteryUsage.InsertOnSubmit(newbatteryUsage);
+        }
+        void insertNewLocationsValue(TimeSpan timespan, Double longitude, Double latitude, Double battery_level)
+        {
+            // Create a new item based on the text box.
+            Locations newLocation = new Locations { LocationsTime = timespan , LocationsLongitude = longitude, LocationsLatitude = latitude , LocationsBatteryLevel = battery_level};
+
+            // Add anew item to the observable collection.
+            Locations.Add(newLocation);
+
+            // Add a to-do item to the local database.
+            locationsBaterryDB.locations.InsertOnSubmit(newLocation);
+        }
 
 
     }
+
+
+    /*
+
+        DATABASE STUFF
+
+
+    */
     public class LocationsAndBatteryDataContext : DataContext
     {
         // Specify the connection string as a static, used in main page and app.xaml.
