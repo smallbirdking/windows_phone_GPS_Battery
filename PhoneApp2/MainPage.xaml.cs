@@ -372,12 +372,14 @@ namespace PhoneApp2
             // Execute the query and place the results into a collection.
             //ObservableCollection<BatteryUsage> batteryUsagesValues = new ObservableCollection<BatteryUsage>(batteryUsagesInDB.GetEnumerator.);
             // 3. Query execution.
+            int cpt = 0;
             foreach (int batteryUsagesValue in batteryUsagesInDB)
             {
+                cpt++;
                 average += batteryUsagesValue;
             }
             
-            return average;
+            return (int)(average/ cpt);
         }
 
 
