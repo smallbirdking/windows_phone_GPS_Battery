@@ -7,13 +7,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:my="clr-namespace:Microsoft.Phone.Controls.Maps;assembly=Microsoft.Phone.Controls.Maps"
+    xmlns:maps="clr-namespace:Microsoft.Phone.Maps.Controls;assembly=Microsoft.Phone.Maps"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
-
+    <Grid x:Name="LayoutRoot" Background="Transparent">
     <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,12">
         <Grid.RowDefinitions>
             <RowDefinition Height="241*"/>
@@ -23,7 +24,7 @@
         <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,42,0,0" Name="textBlock2" Text="Lat:" VerticalAlignment="Top" />
         <TextBlock Height="30" HorizontalAlignment="Left" Margin="71,6,0,0" Name="longitudeTextBlock" Text="Long" VerticalAlignment="Top" />
         <TextBlock Height="30" HorizontalAlignment="Left" Margin="53,42,0,0" Name="latitudeTextBlock" Text="Lat" VerticalAlignment="Top" />
-        <my:Map Height="352" HorizontalAlignment="Left" Margin="12,80.866,0,0" Name="myMap" VerticalAlignment="Top" Width="421" CredentialsProvider="AoCzpmnqBuqL32Fe2zPiQ4hL_6NDTN6eA3EZ39sbLGlX0vD6xJBe6q0z0Xc4_ViY" ZoomLevel="1" Grid.Row="1" />
+        <maps:Map Name="myMap" Height="352" HorizontalAlignment="Left" Margin="12,80.866,0,0"  VerticalAlignment="Top" Width="421"  ZoomLevel="1" Grid.Row="1" />
         <TextBlock Height="30" HorizontalAlignment="Left" Margin="12,196,0,0" Name="textBlock3" Text="Status:" VerticalAlignment="Top" />
         <TextBlock Height="66" HorizontalAlignment="Left" Margin="78,196,0,0" Name="statusTextBlock" Text="Status TextBlock w/TextWrapping=&quot;Wrap&quot;" VerticalAlignment="Top" Width="355" TextWrapping="Wrap" Grid.RowSpan="2" />
         <Button Content="Track Me On Map" Height="72" HorizontalAlignment="Left" Margin="0,14.866,0,0" Name="trackMe" VerticalAlignment="Top" Width="115" Click="trackMe_Click" Grid.Row="1" />
@@ -39,5 +40,5 @@
             <Button Content="get informaion battery" Click="Button_Click" Margin="164,0,163,0" Height="65" />
         </StackPanel>
     </Grid>
-
+    </Grid>
 </phone:PhoneApplicationPage>

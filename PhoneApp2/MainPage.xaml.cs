@@ -8,7 +8,6 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 using PhoneApp2.Resources;
-using Microsoft.Phone.Controls.Maps;
 using System.Device.Location;
 using System.Threading;
 using Windows.Phone.Devices.Power;
@@ -18,6 +17,10 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 
 
+using Microsoft.Phone.Maps.Controls;
+using System.Device.Location;
+using System.Windows.Shapes;
+using System.Windows.Media;
 namespace PhoneApp2
 {
     public enum Places{
@@ -28,8 +31,9 @@ namespace PhoneApp2
         GeoCoordinateWatcher watcher;
         Places currentPlace;
         bool trackingOn = false;
+        Color[] tabColor = new Color[13]; 
 
-        Pushpin myPushpin = new Pushpin();
+        Microsoft.Phone.Controls.Maps.Pushpin myPushpin = new Microsoft.Phone.Controls.Maps.Pushpin();
         int batteryLevelWhenEnteringCurrentPlace;
         // Data context for the local database
         private LocationsAndBatteryDataContext locationsBaterryDB;
@@ -38,7 +42,23 @@ namespace PhoneApp2
         // Constructeur
         public MainPage()
         {
+            
             InitializeComponent();
+            tabColor[0] = Colors.Black;
+            tabColor[1] = Colors.Blue;
+            tabColor[2] = Colors.Yellow;
+            tabColor[3] = Colors.Green;
+            tabColor[4] = Colors.Magenta;
+            tabColor[5] = Colors.Orange;
+            tabColor[6] = Colors.Purple;
+            tabColor[7] = Colors.Red;
+            tabColor[8] = Colors.Cyan;
+            tabColor[9] = Colors.DarkGray;
+            tabColor[10] = Colors.Gray;
+            tabColor[11] = Colors.LightGray;
+            tabColor[12] = Colors.Brown;
+            
+
             watcher = new GeoCoordinateWatcher(GeoPositionAccuracy.High);
             watcher.MovementThreshold = 10.0f;
             watcher.StatusChanged += new EventHandler<GeoPositionStatusChangedEventArgs>(watcher_StatusChanged);
@@ -54,9 +74,49 @@ namespace PhoneApp2
             // Data context and observable collection are children of the main page.
             this.DataContext = this;
 
+            
+        }
+
+        private void ShowMyLocationOnTheMap(double latitude, double longitude, Color color)
+        {
+
+            longitude = (double.IsNaN(longitude)) ? 0.0 : longitude;
+            latitude = (double.IsNaN(latitude)) ? 0.0 : latitude;
+
+            GeoCoordinate myGeocoordinate = new GeoCoordinate(latitude, longitude);
+
+            // Make my current location the center of the Map.
+            this.myMap.Center = myGeocoordinate;
+            this.myMap.ZoomLevel = 13;
+
+            Grid MyGrid = new Grid();
+            MyGrid.RowDefinitions.Add(new RowDefinition());
+            MyGrid.RowDefinitions.Add(new RowDefinition());
+            MyGrid.Background = new SolidColorBrush(Colors.Transparent);
+
+            Ellipse myCircle = new Ellipse();
+            myCircle.Fill = new SolidColorBrush(color);
+            myCircle.Height = 5;
+            myCircle.Width = 5;
+            myCircle.Opacity = 50;
+
+            MyGrid.Children.Add(myCircle);
+            // Create a MapOverlay to contain the circle.
+            MapOverlay myLocationOverlay = new MapOverlay();
+            myLocationOverlay.Content = MyGrid;
+            myLocationOverlay.PositionOrigin = new Point(0.5, 0.5);
+            myLocationOverlay.GeoCoordinate = myGeocoordinate;
+
+            // Create a MapLayer to contain the MapOverlay.
+            MapLayer myLocationLayer = new MapLayer();
+            myLocationLayer.Add(myLocationOverlay);
+
+
+            // Add the MapLayer to the Map.
+            this.myMap.Layers.Add(myLocationLayer);
+
 
         }
-        
 
         // Define an observable collection property that controls can bind to.
         private ObservableCollection<Locations> _locations;
@@ -197,6 +257,7 @@ namespace PhoneApp2
         }
         void watcher_PositionChanged(object sender, GeoPositionChangedEventArgs<GeoCoordinate> e)
         {
+         
             latitudeTextBlock.Text = e.Position.Location.Latitude.ToString("0.0000000000000");
             this.myCurrentLatitude = e.Position.Location.Latitude;
             this.myCurrentLongitude = e.Position.Location.Longitude;
@@ -208,9 +269,40 @@ namespace PhoneApp2
             {
                 myPushpin.Location = e.Position.Location;
                 myMap.Center = e.Position.Location;
-                if (myMap.Children.Contains(myPushpin) == false)
+                /*Grid MyGrid = new Grid();
+                MyGrid.RowDefinitions.Add(new RowDefinition());
+                MyGrid.RowDefinitions.Add(new RowDefinition());
+                MyGrid.Background = new SolidColorBrush(Colors.Transparent);
+                Polygon MyPolygon = new Polygon();
+                MyPolygon.Points.Add(new Point(2, 0));
+                MyPolygon.Points.Add(new Point(22, 0));
+                MyPolygon.Points.Add(new Point(2, 40));
+                MyPolygon.Stroke = new SolidColorBrush(Colors.Black);
+                MyPolygon.Fill = new SolidColorBrush(Colors.Black);
+                MyPolygon.SetValue(Grid.RowProperty, 1);
+                MyPolygon.SetValue(Grid.ColumnProperty, 0);
+
+                //Adding the Polygon to the Grid
+                MyGrid.Children.Add(MyPolygon);
+                //Creating a MapOverlay and adding the Grid to it.
+                MapOverlay MyOverlay = new MapOverlay();
+                MyOverlay.Content = MyGrid;
+                MyOverlay.GeoCoordinate = e.Position.Location;
+                MyOverlay.PositionOrigin = new Point(0, 0.5);
+                MapLayer MyLayer = new MapLayer();
+                MyLayer.Add(MyOverlay);
+                if (myMap.Layers.Contains(MyLayer) == false)
                 {
-                    myMap.Children.Add(myPushpin);
+                    myMap.Layers.Add(MyLayer);
+                }*/
+
+                double[] d = new double[] { e.Position.Location.Latitude, e.Position.Location.Longitude};
+
+                double[][] rans = Place_symylator.randomPlace(d, 0.0005);
+                myMap.Layers.Clear();
+                for (int i = 0; i < rans.Length; i++)
+                {
+                    ShowMyLocationOnTheMap(rans[i][0], rans[i][1], tabColor[0]);
                 }
             }
         }
