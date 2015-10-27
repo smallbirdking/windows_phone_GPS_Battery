@@ -366,11 +366,17 @@ namespace PhoneApp2
         {
             int average = 0;
             var batteryUsagesInDB = from BatteryUsage bu in locationsBaterryDB.batteryUsage
-                                    select BatteryUsage;
+                                    select bu.BatteryUsageValue;
 
 
             // Execute the query and place the results into a collection.
-            ObservableCollection<BatteryUsage> batteryUsagesValues = new ObservableCollection<BatteryUsage>(batteryUsagesInDB);
+            //ObservableCollection<BatteryUsage> batteryUsagesValues = new ObservableCollection<BatteryUsage>(batteryUsagesInDB.GetEnumerator.);
+            // 3. Query execution.
+            foreach (int batteryUsagesValue in batteryUsagesInDB)
+            {
+                average += batteryUsagesValue;
+            }
+            
             return average;
         }
 
