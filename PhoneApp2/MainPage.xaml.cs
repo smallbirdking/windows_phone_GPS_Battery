@@ -74,9 +74,9 @@ namespace PhoneApp2
             // Data context and observable collection are children of the main page.
             this.DataContext = this;
 
-            
-        }
 
+        }
+        
         private void ShowMyLocationOnTheMap(double latitude, double longitude, Color color)
         {
 
@@ -318,7 +318,10 @@ namespace PhoneApp2
             this.batteryLevelWhenEnteringCurrentPlace = myBattery.RemainingChargePercent;
 
             insertNewLocationsValue(new DateTime(), myCurrentLongitude, myCurrentLatitude, myBattery.RemainingChargePercent, newPlace);
+            //Display the average of all the values in BatteryUsageTable for this newPlace
+            getAverageBatteryUsage(newPlace);
             //start recording the positions and save it with the Place name
+            //launch a timeout which call insertNewLocationsValue every minute
 
         }
         /*
@@ -358,6 +361,17 @@ namespace PhoneApp2
 
             // Add a to-do item to the local database.
             locationsBaterryDB.locations.InsertOnSubmit(newLocation);
+        }
+        int getAverageBatteryUsage(Places place)
+        {
+            int average = 0;
+            var batteryUsagesInDB = from BatteryUsage bu in locationsBaterryDB.batteryUsage
+                                    select BatteryUsage;
+
+
+            // Execute the query and place the results into a collection.
+            ObservableCollection<BatteryUsage> batteryUsagesValues = new ObservableCollection<BatteryUsage>(batteryUsagesInDB);
+            return average;
         }
 
 
