@@ -434,7 +434,7 @@ namespace PhoneApp2
     public class LocationsAndBatteryDataContext : DataContext
     {
         // Specify the connection string as a static, used in main page and app.xaml.
-        public static string DBConnectionString = "Data Source=isostore:/ToDo.sdf";
+        public static string DBConnectionString = "Data Source=isostore:/BatteryUsage.sdf";
 
         // Pass the connection string to the base class.
         public LocationsAndBatteryDataContext(string connectionString)
