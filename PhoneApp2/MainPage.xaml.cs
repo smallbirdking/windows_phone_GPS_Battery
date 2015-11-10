@@ -26,6 +26,7 @@ namespace PhoneApp2
     public enum Places{
         UNKNOWN = -1,  WORK = 0, HOME = 1, SCHOOL = 2, BEACH = 3
     }
+
     public partial class MainPage : PhoneApplicationPage, INotifyPropertyChanged
     {
         GeoCoordinateWatcher watcher;
@@ -71,12 +72,60 @@ namespace PhoneApp2
             // Connect to the database and instantiate data context.
             locationsBaterryDB = new LocationsAndBatteryDataContext(LocationsAndBatteryDataContext.DBConnectionString);
 
+
+            var batteryUsagesInDB = from BatteryUsageDB bu in locationsBaterryDB.batteryUsage
+                                                        select bu;
+
+            // Execute the query and place the results into a collection.
+            BatteryUsage = new ObservableCollection<BatteryUsageDB>(batteryUsagesInDB);
+     
+
+
+            var locationsInDB = from Locations bu in locationsBaterryDB.locations
+                                    select bu;
+
+            // Execute the query and place the results into a collection.
+            Locations = new ObservableCollection<Locations>(locationsInDB);
+
             // Data context and observable collection are children of the main page.
             this.DataContext = this;
 
 
         }
-        
+        // Define an observable collection property that controls can bind to.
+        private ObservableCollection<Locations> _locations;
+        public ObservableCollection<Locations> Locations
+        {
+            get
+            {
+                return _locations;
+            }
+            set
+            {
+                if (_locations != value)
+                {
+                    _locations = value;
+                    NotifyPropertyChanged("Locations");
+                }
+            }
+        }
+        // Define an observable collection property that controls can bind to.
+        private ObservableCollection<BatteryUsageDB> _batteryUsage;
+        public ObservableCollection<BatteryUsageDB> BatteryUsage
+        {
+            get
+            {
+                return _batteryUsage;
+            }
+            set
+            {
+                if (_batteryUsage != value)
+                {
+                    _batteryUsage = value;
+                    NotifyPropertyChanged("BatteryUsage");
+                }
+            }
+        }
         private void ShowMyLocationOnTheMap(double latitude, double longitude, Color color)
         {
 
@@ -118,42 +167,7 @@ namespace PhoneApp2
 
         }
 
-        // Define an observable collection property that controls can bind to.
-        private ObservableCollection<Locations> _locations;
-        public ObservableCollection<Locations> Locations
-        {
-            get
-            {
-                return _locations;
-            }
-            set
-            {
-                if (_locations != value)
-                {
-                    _locations = value;
-                    NotifyPropertyChanged("Locations");
-                }
-            }
-        }
-        // Define an observable collection property that controls can bind to.
-        private ObservableCollection<BatteryUsage> _batteryUsage;
-        public ObservableCollection<BatteryUsage> BatteryUsage
-        {
-            get
-            {
-                return _batteryUsage;
-            }
-            set
-            {
-                if (_batteryUsage != value)
-                {
-                    _batteryUsage = value;
-                    NotifyPropertyChanged("BatteryUsage");
-                }
-            }
-        }
-
-
+       
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -265,8 +279,23 @@ namespace PhoneApp2
             speedreadout.Text = e.Position.Location.Speed.ToString("0.0") + " meters per second";
             coursereadout.Text = e.Position.Location.Course.ToString("0.0");
             coursereadout.Text = e.Position.Location.Course.ToString("0.0");
+
+            
             if (trackingOn)
             {
+                //try to save on DB
+                System.Diagnostics.Debug.WriteLine("test debug " + e.Position.Location);
+
+
+               insertNewBatteryUsageValue(Places.UNKNOWN, 55);
+                enteringAPlace(Places.UNKNOWN);
+
+
+                System.Diagnostics.Debug.WriteLine("test debug " + e.Position.Location);
+                System.Diagnostics.Debug.WriteLine("test debug average " + getAverageBatteryUsage(Places.UNKNOWN));
+
+
+
                 myPushpin.Location = e.Position.Location;
                 myMap.Center = e.Position.Location;
                 /*Grid MyGrid = new Grid();
@@ -305,6 +334,10 @@ namespace PhoneApp2
                     ShowMyLocationOnTheMap(rans[i][0], rans[i][1], tabColor[0]);
                 }
             }
+            else
+            {
+                leavingCurrentPlace();
+            }
         }
         /*
             Entering in a new place = check if enough battery compared to the former battery usage data
@@ -317,10 +350,14 @@ namespace PhoneApp2
             var myBattery = Battery.GetDefault();
             this.batteryLevelWhenEnteringCurrentPlace = myBattery.RemainingChargePercent;
 
-            insertNewLocationsValue(new DateTime(), myCurrentLongitude, myCurrentLatitude, myBattery.RemainingChargePercent, newPlace);
+            System.Diagnostics.Debug.WriteLine("DEBUG remaining battery " + batteryLevelWhenEnteringCurrentPlace);
+
+            insertNewLocationsValue(new DateTime(), myCurrentLongitude, myCurrentLatitude, batteryLevelWhenEnteringCurrentPlace, newPlace);
+            insertNewBatteryUsageValue(newPlace, batteryLevelWhenEnteringCurrentPlace);
             //Display the average of all the values in BatteryUsageTable for this newPlace
             getAverageBatteryUsage(newPlace);
             //start recording the positions and save it with the Place name
+
             //launch a timeout which call insertNewLocationsValue every minute
 
         }
@@ -333,9 +370,9 @@ namespace PhoneApp2
             //How much did we used the battery at that place ?
             var myBattery = Battery.GetDefault();
             //By doing this we also suppose that the user didn't charge his phone (otherwise the value will be negative)
-            int batteryUsage = this.batteryLevelWhenEnteringCurrentPlace - myBattery.RemainingChargePercent; 
+            //int batteryUsage = this.batteryLevelWhenEnteringCurrentPlace - myBattery.RemainingChargePercent; 
             //Here we have to Save the data usage for currentPlace (batteryUsage)
-            insertNewBatteryUsageValue(currentPlace, batteryUsage);
+            insertNewBatteryUsageValue(currentPlace, myBattery.RemainingChargePercent);
 
             this.currentPlace = Places.UNKNOWN;
 
@@ -343,10 +380,11 @@ namespace PhoneApp2
         void insertNewBatteryUsageValue(Places place, int batteryUsageValue)
         {
             // Create a new  item based on the text box.
-            BatteryUsage newbatteryUsage = new BatteryUsage { Place = (int)place , BatteryUsageValue = batteryUsageValue};
+            BatteryUsageDB newbatteryUsage = new BatteryUsageDB { Place = (int)place , BatteryUsageValue = batteryUsageValue};
 
             // Add anew item to the observable collection.
             BatteryUsage.Add(newbatteryUsage);
+            System.Diagnostics.Debug.WriteLine("DEBUG batteryusage size" + BatteryUsage.Count);
 
             // Add a to-do item to the local database.
             locationsBaterryDB.batteryUsage.InsertOnSubmit(newbatteryUsage);
@@ -359,26 +397,27 @@ namespace PhoneApp2
             // Add anew item to the observable collection.
             Locations.Add(newLocation);
 
+            System.Diagnostics.Debug.WriteLine("DEBUG locations size" + Locations.Count);
+
             // Add a to-do item to the local database.
             locationsBaterryDB.locations.InsertOnSubmit(newLocation);
         }
         int getAverageBatteryUsage(Places place)
         {
             int average = 0;
-            var batteryUsagesInDB = from BatteryUsage bu in locationsBaterryDB.batteryUsage
-                                    select bu.BatteryUsageValue;
-
-
-            // Execute the query and place the results into a collection.
-            //ObservableCollection<BatteryUsage> batteryUsagesValues = new ObservableCollection<BatteryUsage>(batteryUsagesInDB.GetEnumerator.);
-            // 3. Query execution.
+           
             int cpt = 0;
-            foreach (int batteryUsagesValue in batteryUsagesInDB)
+            foreach (BatteryUsageDB batteryUsagesValue in BatteryUsage)
             {
                 cpt++;
-                average += batteryUsagesValue;
+                average += batteryUsagesValue.BatteryUsageValue;
+                System.Diagnostics.Debug.WriteLine("DEBUG batteryUsageValue loop value" + batteryUsagesValue.BatteryUsageValue);
+                System.Diagnostics.Debug.WriteLine("DEBUG batteryUsageValue loop average" + average);
             }
-            
+            if (cpt == 0)
+            {
+                return 0;
+            }
             return (int)(average/ cpt);
         }
 
@@ -403,7 +442,7 @@ namespace PhoneApp2
         { }
 
         public Table<Locations> locations;
-        public Table<BatteryUsage> batteryUsage;
+        public Table<BatteryUsageDB> batteryUsage;
     }
 
     [Table]
@@ -563,7 +602,7 @@ namespace PhoneApp2
     }
 
     [Table]
-    public class BatteryUsage : INotifyPropertyChanged, INotifyPropertyChanging
+    public class BatteryUsageDB : INotifyPropertyChanged, INotifyPropertyChanging
     {
         // Define ID: private field, public property and database column.
         private int _batteryUsageId;
