@@ -61,6 +61,11 @@ namespace PhoneApp2
                 {
                     //Create the database
                     db.CreateDatabase();
+                    System.Diagnostics.Debug.WriteLine("Creating a DB !");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("DB already created!");
                 }
             }
 
